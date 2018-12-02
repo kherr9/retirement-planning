@@ -14,7 +14,18 @@
             <label>Amount of funds in taxable account</label>
             <input type="number" name="taxableFunds" />
         </div>
-
+        <div>
+            <label>Domestic Stock %</label>
+            <input type="number" name="domesticStockPercent" value="75" />
+        </div>
+        <div>
+            <label>International Stock %</label>
+            <input type="number" name="internationalStockPercent" value="15" />
+        </div>
+        <div>
+            <label>Bond %</label>
+            <input type="number" name="bondPercent" value="10" />
+        </div>
         <button type="submit">Compute</button>
     </form>
 </body>
@@ -27,18 +38,33 @@
 
         console.log("taxFreeFunds", formViewModel.taxFreeFunds);
         console.log("taxableFunds", formViewModel.taxableFunds);
+        console.log("domesticStockPercent", formViewModel.domesticStockPercent);
+        console.log("internationalStockPercent", formViewModel.internationalStockPercent);
+        console.log("bondPercent", formViewModel.bondPercent);
 
         return false;
     };
 
     class FormViewModel {
-        
+
         get taxFreeFunds() {
             return parseInt(document.getElementsByName("taxFreeFunds")[0].value);
         }
 
-        get taxableFunds(){
+        get taxableFunds() {
             return parseInt(document.getElementsByName("taxableFunds")[0].value);
+        }
+
+        get domesticStockPercent() {
+            return parseInt(document.getElementsByName("domesticStockPercent")[0].value);
+        }
+
+        get internationalStockPercent() {
+            return parseInt(document.getElementsByName("internationalStockPercent")[0].value);
+        }
+
+        get bondPercent() {
+            return parseInt(document.getElementsByName("bondPercent")[0].value);
         }
     }
 
