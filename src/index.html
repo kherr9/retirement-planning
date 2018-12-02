@@ -1,30 +1,35 @@
 <html>
 
 <head>
-    <title>Allocation by Account Type</title>
+    <title>Tax-Efficient Fund Placement Calculator</title>
 </head>
 
 <body>
+    <p>Since your portfolio may be split between multiple locations (one or more tax-advantaged retirement accounts,
+        and one or more taxable accounts) you should look at Principles of tax-efficient fund placement to determine
+        which funds belong in each account. In general, the international fund should go into a taxable account, the
+        bond fund should go into a tax-advantaged account, and the domestic equity fund should fill in the remaining
+        space.</p>
     <form id="form">
         <div>
             <label>Amount of funds in tax shelter (IRA, 401K)</label>
-            <input type="number" name="taxFreeFunds" />
+            <input type="number" name="taxFreeFunds" value="200000" required />
         </div>
         <div>
             <label>Amount of funds in taxable account</label>
-            <input type="number" name="taxableFunds" />
+            <input type="number" name="taxableFunds" value="50000" required />
         </div>
         <div>
             <label>Domestic Stock %</label>
-            <input type="number" name="domesticStockPercent" value="75" />
+            <input type="number" name="domesticStockPercent" value="75" required />
         </div>
         <div>
             <label>International Stock %</label>
-            <input type="number" name="internationalStockPercent" value="15" />
+            <input type="number" name="internationalStockPercent" value="15" required />
         </div>
         <div>
             <label>Bond %</label>
-            <input type="number" name="bondPercent" value="10" />
+            <input type="number" name="bondPercent" value="10" required />
         </div>
         <button type="submit">Compute</button>
     </form>
@@ -33,17 +38,26 @@
 <script>
 
     document.getElementById('form').onsubmit = function (e) {
-
-        var formViewModel = new FormViewModel();
-
-        console.log("taxFreeFunds", formViewModel.taxFreeFunds);
-        console.log("taxableFunds", formViewModel.taxableFunds);
-        console.log("domesticStockPercent", formViewModel.domesticStockPercent);
-        console.log("internationalStockPercent", formViewModel.internationalStockPercent);
-        console.log("bondPercent", formViewModel.bondPercent);
-
+        try{
+            calculate();
+        }catch(e){
+            alert(e);
+        }
         return false;
     };
+
+    function calculate() {
+
+        let formViewModel = new FormViewModel();
+
+        let taxFreeAccount = new Account(formViewModel.taxFreeFunds);
+        let taxableAccount = new Account(formViewModel.taxableFunds);
+        let totalFunds = formViewModel.taxFreeFunds + formViewModel.taxableFunds;
+
+        let domesticStockAsset = new Asset(totalFunds * (100 - formViewModel.domesticStockPercent));
+        let internationalStockAsset = new Asset(totalFunds * (100 - formViewModel.internationalStockPercent));
+        let bondAsset = new Asset(totalFunds * (100 - formViewModel.bondPercent));
+    }
 
     class FormViewModel {
 
@@ -67,6 +81,38 @@
             return parseInt(document.getElementsByName("bondPercent")[0].value);
         }
     }
+
+    class Account {
+
+        constructor(limit) {
+            this.assets = [];
+            this.limit = limit;
+        }
+
+        addFunds(asset) {
+            throw 'not implemented';
+        }
+    }
+
+    class Asset {
+        constructor(value) {
+            this.value = value;
+        }
+    }
+
+    class DomesticStockAsset extends Asset {
+
+    }
+
+    class InternationalStockAsset extends Asset {
+
+    }
+
+    class BondAsset extends Asset {
+
+    }
+
+
 
 </script>
 
