@@ -1,0 +1,47 @@
+<html>
+
+<head>
+    <title>Allocation by Account Type</title>
+</head>
+
+<body>
+    <form id="form">
+        <div>
+            <label>Amount of funds in tax shelter (IRA, 401K)</label>
+            <input type="number" name="taxFreeFunds" />
+        </div>
+        <div>
+            <label>Amount of funds in taxable account</label>
+            <input type="number" name="taxableFunds" />
+        </div>
+
+        <button type="submit">Compute</button>
+    </form>
+</body>
+
+<script>
+
+    document.getElementById('form').onsubmit = function (e) {
+
+        var formViewModel = new FormViewModel();
+
+        console.log("taxFreeFunds", formViewModel.taxFreeFunds);
+        console.log("taxableFunds", formViewModel.taxableFunds);
+
+        return false;
+    };
+
+    class FormViewModel {
+        
+        get taxFreeFunds() {
+            return parseInt(document.getElementsByName("taxFreeFunds")[0].value);
+        }
+
+        get taxableFunds(){
+            return parseInt(document.getElementsByName("taxableFunds")[0].value);
+        }
+    }
+
+</script>
+
+</html>
