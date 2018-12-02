@@ -38,9 +38,9 @@
 <script>
 
     document.getElementById('form').onsubmit = function (e) {
-        try{
+        try {
             calculate();
-        }catch(e){
+        } catch (e) {
             alert(e);
         }
         return false;
@@ -54,9 +54,18 @@
         let taxableAccount = new Account(formViewModel.taxableFunds);
         let totalFunds = formViewModel.taxFreeFunds + formViewModel.taxableFunds;
 
-        let domesticStockAsset = new Asset(totalFunds * (100 - formViewModel.domesticStockPercent));
-        let internationalStockAsset = new Asset(totalFunds * (100 - formViewModel.internationalStockPercent));
-        let bondAsset = new Asset(totalFunds * (100 - formViewModel.bondPercent));
+        let domesticStockAsset = new Asset(totalFunds * (formViewModel.domesticStockPercent / 100));
+        let internationalStockAsset = new Asset(totalFunds * (formViewModel.internationalStockPercent / 100));
+        let bondAsset = new Asset(totalFunds * (formViewModel.bondPercent / 100));
+
+        add(internationalStockAsset, taxableAccount, taxFreeAccount);
+        add(bondAsset, taxFreeAccount, taxableAccount);
+        add(domesticStockAsset, taxableAccount, taxFreeAccount);
+    }
+
+    function add(asset, primaryAccount, secondaryAccount) {
+        //var available = primaryAccount.remaining();
+        console.log(asset, asset.value);
     }
 
     class FormViewModel {
@@ -90,7 +99,23 @@
         }
 
         addFunds(asset) {
-            throw 'not implemented';
+            if (asset.value > remaining())
+                throw 'not enough room in account';
+
+            this.assets.add(asset);
+        }
+
+        get remaining() {
+            this.limit - value();
+        }
+
+        get value() {
+            var result = 0;
+            for (var i = 0; i < this.assets.length; i++) {
+                result += this.assets[i].value;
+            }
+
+            return result;
         }
     }
 
@@ -111,8 +136,6 @@
     class BondAsset extends Asset {
 
     }
-
-
 
 </script>
 
