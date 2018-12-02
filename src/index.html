@@ -40,8 +40,8 @@
     document.getElementById('form').onsubmit = function (e) {
         try {
             calculate();
-        } catch (e) {
-            alert(e);
+        } catch (err) {
+            alert(err);
         }
         return false;
     };
@@ -54,18 +54,27 @@
         let taxableAccount = new Account(formViewModel.taxableFunds);
         let totalFunds = formViewModel.taxFreeFunds + formViewModel.taxableFunds;
 
-        let domesticStockAsset = new Asset(totalFunds * (formViewModel.domesticStockPercent / 100));
-        let internationalStockAsset = new Asset(totalFunds * (formViewModel.internationalStockPercent / 100));
-        let bondAsset = new Asset(totalFunds * (formViewModel.bondPercent / 100));
+        let domesticStockAsset = new DomesticStockAsset(totalFunds * (formViewModel.domesticStockPercent / 100));
+        let internationalStockAsset = new InternationalStockAsset(totalFunds * (formViewModel.internationalStockPercent / 100));
+        let bondAsset = new BondAsset(totalFunds * (formViewModel.bondPercent / 100));
 
         add(internationalStockAsset, taxableAccount, taxFreeAccount);
         add(bondAsset, taxFreeAccount, taxableAccount);
         add(domesticStockAsset, taxableAccount, taxFreeAccount);
+
+        debugger;
     }
 
     function add(asset, primaryAccount, secondaryAccount) {
-        //var available = primaryAccount.remaining();
-        console.log(asset, asset.value);
+        if (asset.value <= primaryAccount.remaining) {
+            primaryAccount.add(asset);
+            return;
+        }
+
+        let remaining = primaryAccount.remaining;
+
+        primaryAccount.add(asset.create(remaining));
+        secondaryAccount.add(asset.create(asset.value - remaining));
     }
 
     class FormViewModel {
@@ -98,15 +107,15 @@
             this.limit = limit;
         }
 
-        addFunds(asset) {
-            if (asset.value > remaining())
+        add(asset) {
+            if (asset.value > this.remaining)
                 throw 'not enough room in account';
 
-            this.assets.add(asset);
+            this.assets.push(asset);
         }
 
         get remaining() {
-            this.limit - value();
+            return this.limit - this.value;
         }
 
         get value() {
@@ -122,6 +131,19 @@
     class Asset {
         constructor(value) {
             this.value = value;
+        }
+
+        subtract(amount) {
+            var result = this.value - amount;
+            if (result < 0) {
+                throw "cannot have negative subtraction";
+            }
+
+            return new this.constructor(result);
+        }
+
+        create(amount) {
+            return new this.constructor(amount);
         }
     }
 
