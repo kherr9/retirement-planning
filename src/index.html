@@ -33,6 +33,22 @@
         </div>
         <button type="submit">Compute</button>
     </form>
+
+    <div id="taxShelterAmount">
+        <div>Tax Shelter</div>
+        <div>
+            <label>Domestic Stock Amount</label>
+            <div name="domesticStockAmount"></div>
+        </div>
+        <div>
+            <label>International Stock Amount</label>
+            <div name="internationalStockAmount"></div>
+        </div>
+        <div>
+            <label>Bond Amount</label>
+            <div name="bondAmount"></div>
+        </div>
+    </div>
 </body>
 
 <script>
@@ -49,6 +65,7 @@
     function calculate() {
 
         let formViewModel = new FormViewModel();
+        let taxShelterAmountViewModel = new AccountViewModel('#taxShelterAmount')
 
         let taxFreeAccount = new Account(formViewModel.taxFreeFunds);
         let taxableAccount = new Account(formViewModel.taxableFunds);
@@ -61,6 +78,13 @@
         add(internationalStockAsset, taxableAccount, taxFreeAccount);
         add(bondAsset, taxFreeAccount, taxableAccount);
         add(domesticStockAsset, taxableAccount, taxFreeAccount);
+
+        console.log('tax free:')
+
+        for (var i = 0; i < taxFreeAccount.assets.length; i++) {
+            console.log(taxFreeAccount.assets[i]);
+            taxShelterAmountViewModel.setAmount(taxFreeAccount.assets[i]);
+        }
     }
 
     function add(asset, primaryAccount, secondaryAccount) {
@@ -73,6 +97,39 @@
 
         primaryAccount.add(asset.create(remaining));
         secondaryAccount.add(asset.create(asset.value - remaining));
+    }
+
+    class AccountViewModel {
+        constructor(root) {
+            this.root = root;
+            this._setValue('domesticStockAmount', 0);
+            this._setValue('internationalStockAmount', 0);
+            this._setValue('bondAmount', 0);
+        }
+
+        _querySelector(tail) {
+            return document.querySelector(this.root + ' ' + tail);
+        }
+
+        _setValue(name, value) {
+            this._querySelector('[name = "' + name + '"]').innerText = value;
+        }
+
+        setAmount(asset) {
+            asset.setAmount(this);
+        }
+
+        setDomesticStockAmount(asset) {
+            this._setValue('domesticStockAmount', asset.value);
+        }
+
+        setInternationlStockAmount(asset) {
+            this._setValue('internationlStockAmount', asset.value);
+        }
+
+        setBondAmount(asset) {
+            this._setValue('bondAmount', asset.value);
+        }
     }
 
     class FormViewModel {
@@ -146,15 +203,21 @@
     }
 
     class DomesticStockAsset extends Asset {
-
+        setAmount(viewModel) {
+            viewModel.setDomesticStockAmount(this);
+        }
     }
 
     class InternationalStockAsset extends Asset {
-
+        setAmount(viewModel) {
+            viewModel.setInternationlStockAmount(this);
+        }
     }
 
     class BondAsset extends Asset {
-
+        setAmount(viewModel) {
+            viewModel.setBondAmount(this);
+        }
     }
 
 </script>
